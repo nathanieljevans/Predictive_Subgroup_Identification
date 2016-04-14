@@ -36,6 +36,7 @@ class Patient:
         self.gen_char = gen 
         self.patient_char = pat     
     
+        Subgroup.v_min = np.minimum(np.array(p1.patient_char), np.array(p2.patient_char)) # all patients in this subgroup have trait x_i greater than min[i]
 def main() : 
     path_in = input("Which pathname to use (work/home)")
     path = ""
