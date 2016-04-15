@@ -45,7 +45,7 @@ class Subgroup :
     contains similarities between all patients in this subgroup 
     
     '''             
-    subgroup_ids = [0] 
+    subgroup_ids = [] 
     
     # discrete genetic traits (x1:x20)        
     v0 = []
@@ -59,11 +59,13 @@ class Subgroup :
     v_max = []
     v_min = []
     treatment = [] 
+    
+    # initialize with two patients
     def __init__ (self, p1, p2) :   
         Subgroup.subgroup_ids = [p1.id, p2.id] 
         
         # discrete genetic traits (x1:x20)        
-        Subgroup.v0 = 1*np.array(list(map(lambda x,y: x == '0' and y == '0', p1.gen_char, p2.gen_char)))
+        Subgroup.v0 = 1*np.array(list(map(lambda x,y: x == '0' and x == y, p1.gen_char, p2.gen_char)))
         Subgroup.v1 = 1*np.array(list(map(lambda x,y: x == '1' and y == '1', p1.gen_char, p2.gen_char)))
         Subgroup.v2 = 1*np.array(list(map(lambda x,y: x == '2' and y == '2', p1.gen_char, p2.gen_char)))
         Subgroup.v0_1 = self.v0 + self.v1 
@@ -78,20 +80,22 @@ class Subgroup :
         # exclude all non-treatment before subgroup recursion alg. 
         Subgroup.treatment = [p1.trt,p2.trt] 
     
-    def combine(self, Subgroup_2) :  
-        Subgroup.subgroup_ids.append(Subgroup_2.subgroup_ids)
+class Subgroup2(Subgroup):
+    # initialize with two subgroups
+    def __init__ (self, s1, s2): 
+        Subgroup.subgroup_ids = s1.subgroup_ids.append(s2.subgroup_ids)
         
-        Subgroup.v0 = Subgroup.v0 * Subgroup_2.v0 
-        Subgroup.v1 = Subgroup.v1 * Subgroup_2.v1
-        Subgroup.v2 = Subgroup.v2 * Subgroup_2.v2 
-        Subgroup.v0_1 = Subgroup.v0_1 * Subgroup_2.v0_1 
-        Subgroup.v0_2 = Subgroup.v0_2 * Subgroup_2.v0_2 
-        Subgroup.v1_2 = Subgroup.v1_2 * Subgroup_2.v1_2 
+        Subgroup2.v0 = s1.v0 * s2.v0 
+        Subgroup2.v1 = s1.v1 * s2.v1
+        Subgroup2.v2 = s1.v2 * s2.v2 
+        Subgroup2.v0_1 = s1.v0_1 * s2.v0_1 
+        Subgroup2.v0_2 = s1.v0_2 * s2.v0_2 
+        Subgroup2.v1_2 = s1.v1_2 * s2.v1_2         
         
-        Subgroup.max = np.maximum(Subgroup.v_max, Subgroup_2.v_max)
-        Subgroup.min = np.minimum(Subgroup.v_min, Subgroup_2.v_min)
+        Subgroup2.max = np.maximum(s1.v_max, s2.v_max)
+        Subgroup2.min = np.minimum(s1.v_min, s2.v_min)
         
-        Subgroup.treatment = Subgroup.treatment.append(Subgroup_2.treatment)
+        Subgroup2.treatment = s1.treatment.append(s2.treatment)
         
     
 def main() : 
@@ -143,9 +147,10 @@ def main() :
     
     s1 = Subgroup(p1,p2)
     s2 = Subgroup(p3,p4)
+    s3 = Subgroup2(s1,s2)
     print(s1.subgroup_ids)
-    print(p1.gen_char)
-    print(p2.gen_char)
+    print(np.array(list(map(lambda x: int(x), p1.gen_char))))
+    print(np.array(list(map(lambda x: int(x), p2.gen_char))))
     print(str(s1.v0))
     print(str(s1.v1))
     print(str(s1.v2))
@@ -171,15 +176,15 @@ def main() :
     
     
     print () 
-    s1.combine(s2)
-    print(s1.subgroup_ids)
-    print(str(s1.v0))
-    print(str(s1.v1))
-    print(str(s1.v2))
-    print(str(s1.v0_1))
-    print(str(s1.v0_2))
-    print(str(s1.v1_2))
-    print(str(s1.v_max))
-    print(str(s1.v_min))    
+    #s1.combine(s2)
+    print(s3.subgroup_ids)
+    print(str(s3.v0))
+    print(str(s3.v1))
+    print(str(s3.v2))
+    print(str(s3.v0_1))
+    print(str(s3.v0_2))
+    print(str(s3.v1_2))
+    print(str(s3.v_max))
+    print(str(s3.v_min))    
     
 main() 
