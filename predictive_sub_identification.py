@@ -19,8 +19,9 @@ truth_subjects_pathname = "C:\\Users\\Nate\\Downloads\\InnoCentive_9933623_Train
 
 
 patient_groups = {} # groups of 240 patients relevant to eachother 
-dataset_treatment_true = {} 
-dataset_treatment_false = {} 
+# this is a set with the dataset_id as a key and the set being a list of tuples (treatment(y/n), patient id, y_response)
+dataset_treatment_set = {} 
+
 
 class Patient: 
     '''
@@ -70,7 +71,7 @@ class Subgroup :
         self.treatment = [p1.trt,p2.trt] 
     
 class Subgroup2:
-    # initialize with two subgroups
+    # initialize with two subgrou ps
     
     def __init__ (self, s1, s2): 
         self.subgroup_ids = s1.subgroup_ids + s2.subgroup_ids
@@ -87,6 +88,26 @@ class Subgroup2:
         
         Subgroup2.treatment = s1.treatment + s2.treatment 
         
+class dataset_calculation: 
+    
+    def __init__ (self, data_id):
+        self.dataset_id = data_id 
+        self.patient_set = patient_groups[data_id] 
+        self.treated_patients = filter(lambda x,y,z: x == 1, dataset_treatment_set[data_id])
+        self.y_response_sum = sum(self.treated_patients)
+        self.treatment_response = []
+        
+    def get_treatment_response(self,s1): 
+        sub_sum = sum(s1.treatment)
+        not_subgroup_sum = self.y_response_sum - sub_sum
+        num_in_sub = len(s1.treatment)
+        num_not_in_sub = len(self.treated_patients) - num_in_sub
+        avg_diff = (sub_sum / num_in_sub) - (not_subgroup_sum / num_not_in_sub)
+        return avg_diff
+        
+    def recursive_subgroup_generation(self, s1): 
+        
+        
     
 def main() : 
     path_in = input("Which pathname to use (work/home)")
@@ -98,7 +119,7 @@ def main() :
     else : 
         print("Not a valid path option")
     
-    time.clock()
+    start_time = time.clock()
     data_file = list(csv.reader(open(path)))
     
     for i,patient in enumerate(data_file): 
@@ -126,6 +147,10 @@ def main() :
                    patient_groups[dataset] = [p] 
             else : 
                 patient_groups[dataset].append(p)
+            if (dataset not in dataset_treatment_set): 
+                dataset_treatment_set[dataset] = [(treatment, data_id, y_response)]
+            else: 
+                dataset_treatment_set[dataset].append((treatment, data_id, y_response))
                 
       
       
@@ -180,6 +205,6 @@ def main() :
 #    print(str(s3.v_min))    
     
     end_time = time.clock()
-    print("Time Elapsed: " + str((end_time)))    
+    print("Time Elapsed: " + str((end_time - start_time)))    
     
 main() 
