@@ -124,7 +124,10 @@ class dataset_calculation:
         
     def subgroup_combination(): 
         
-        
+        # i is the number of patients in subgroup (1 corresponds to 2 patients)
+        for i in arrange(num_patients-1):
+            for i in arrange():
+                a change
 
         
         
