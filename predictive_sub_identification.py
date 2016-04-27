@@ -17,6 +17,10 @@ example_submit_pathname_HOME = "C:\\Users\\Nate\\Downloads\\InnoCentive_9933623_
 training_data_pathname = "C:\\Users\\Nate\\Downloads\\InnoCentive_9933623_Training_Data.csv" 
 truth_subjects_pathname = "C:\\Users\\Nate\\Downloads\\InnoCentive_9933623_Training_Data_truth_subjects.csv" 
 
+output_work = 'C:\\Users\\Administrator\\Documents\\subgroup_output\\subgroup_treatment.csv'
+output_home = 'C:\\Users\\Nate\\Desktop\\subgroup_csv\\subgroup_treatment.csv'
+
+output_path = '' 
 
 patient_groups = {} # groups of 240 patients relevant to eachother 
 # this is a set with the dataset_id as a key and the set being a list of tuples (treatment(y/n), patient id, y_response)
@@ -79,8 +83,8 @@ class Subgroup :
         
     def add_patient(self, p): 
         self.last_id = p.id
-        self.subgroup_id.append(p.id)
-        self.y_treatment.append(p)   
+        self.subgroup_ids.append(p.id)
+        self.y_treatment.append(p.y_response)   
                 
         self.v0 = p.v0 * self.v0
         self.v1 = p.v1 * self.v1
@@ -94,12 +98,13 @@ class Subgroup :
         self.v_min = np.minimum(self.v_min, p.patient_char) # all patients in this subgroup have trait x_i greater than min[i]
         
 class dataset_calculation: 
-    index = 0
+
     
     def __init__ (self, data_id):
         
+        self.index = 0
         self.dataset_id = data_id 
-        self.patient_set = patient_groups[data_id] 
+        self.patient_set = list(patient_groups[data_id]) 
         #self.treated_patients = np.array((filter(lambda x,y,z: x == 1, dataset_treatment_set[data_id])))
         self.y_response_all = []
         self.y_response_treated = []
@@ -132,34 +137,44 @@ class dataset_calculation:
         
         for i in range(self.num_patients-1):
             for n in range(self.num_patients - 1):
-                if (n > i): 
+                if (n > i and self.index < 10000): 
                     subgroup = Subgroup(self.patient_set[i], self.patient_set[n])
-                    self.response_vector[index] = get_treatment_response(subgroup)
-                    index = index + 1
-                    recursive_gen(subgroup)
+                    self.response_vector[self.index] = self.get_treatment_response(subgroup)
+                    self.index = self.index + 1
+                    self.recursive_gen(subgroup)
                 
     def recursive_gen(self, subgroup): 
         # exit test 
-        if (len(subgroup.subgroup.ids) == self.num_patients): 
+        global output_path
+        if (len(subgroup.subgroup_ids)  == self.num_patients or self.index > 10000): 
+            print("wow it made it!")
+            print(subgroup.subgroup_ids)
+#            myfile = open('C:\\Users\\Nate\\Desktop\\subgroup_csv\\subgroup_treatment.csv', 'wb')
+#            wr = csv.writer(myfile, quoting = csv.QUOTE_ALL)
+#            wr.writerow(list(self.response_vector))
+            np.savetxt(output_path, self.response_vector, delimiter=',')
             return 0 
         
         else: 
             for i in range(subgroup.last_id + 1, self.num_patients-1,1): 
-                subgroup.add_patient(self.patient_set[i])
-                response_vector[index] = get_treatment_response(subgroup)
-                index = index + 1 
-                recursive_gen(subgroup)
+                if (self.index <= 10000): 
+                    subgroup.add_patient(self.patient_set[i])
+                    self.response_vector[self.index] = self.get_treatment_response(subgroup)
+                    self.index = self.index + 1 
+                    self.recursive_gen(subgroup)
 
         
-        
-    
+          
 def main() : 
     path_in = input("Which pathname to use (work/home)")
     path = ""
+    global output_path
     if (path_in == "work"): 
         path = data_pathname_WORK 
+        output_path = output_work
     elif (path_in == "home"): 
         path = data_pathname_HOME 
+        output_path = output_home
     else : 
         print("Not a valid path option")
     
@@ -200,18 +215,18 @@ def main() :
       
       
     #print ("Patient length check " + str(len((patient_groups.keys()))))
-    p1 = patient_groups[1][0] 
-    p2 = patient_groups[1][1] 
-    
-    p3 = patient_groups[1][2]
-    p4 = patient_groups[1][3]
-    
-    s1 = Subgroup(p1,p2)
-    s2 = Subgroup(p3,p4)
-    
-    d1 = dataset_calculation(1)
-    trt = d1.get_treatment_response(s1)
-    print(str(trt))
+#    p1 = patient_groups[1][0] 
+#    p2 = patient_groups[1][1] 
+#    
+#    p3 = patient_groups[1][2]
+#    p4 = patient_groups[1][3]
+#    
+#    s1 = Subgroup(p1,p2)
+#    s2 = Subgroup(p3,p4)
+#    
+#    d1 = dataset_calculation(1)
+#    trt = d1.get_treatment_response(s1)
+#    print(str(trt))
     
 #    print("patient init")
 #    print(str(p1.gen_char))
@@ -259,8 +274,10 @@ def main() :
 #    print(str(s2.v_max))
 #    print(str(s2.v_min))
 #    
+    print("made it here")
        
-    
+    data_1 = dataset_calculation(1)
+    data_1.subgroup_combination()
     end_time = time.clock()
     print("Time Elapsed: " + str((end_time - start_time)))    
     
