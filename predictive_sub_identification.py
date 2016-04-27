@@ -78,9 +78,14 @@ class Subgroup :
         
         
     def add_patient(self, p): 
+<<<<<<< HEAD
         self.last_id = p.id
         self.subgroup_ids.append(p.id)
         self.y_treatment.append(p.y_response)   
+=======
+        self.subgroup_id.append(p.id)
+        self.y_treatment.append(p)   
+>>>>>>> origin/master
                 
         self.v0 = p.v0 * self.v0
         self.v1 = p.v1 * self.v1
@@ -94,6 +99,7 @@ class Subgroup :
         self.v_min = np.minimum(self.v_min, p.patient_char) # all patients in this subgroup have trait x_i greater than min[i]
         
 class dataset_calculation: 
+<<<<<<< HEAD
 
     
     def __init__ (self, data_id):
@@ -101,6 +107,13 @@ class dataset_calculation:
         self.index = 0
         self.dataset_id = data_id 
         self.patient_set = list(patient_groups[data_id]) 
+=======
+    
+    def __init__ (self, data_id):
+        
+        self.dataset_id = data_id 
+        self.patient_set = patient_groups[data_id] 
+>>>>>>> origin/master
         #self.treated_patients = np.array((filter(lambda x,y,z: x == 1, dataset_treatment_set[data_id])))
         self.y_response_all = []
         self.y_response_treated = []
@@ -115,7 +128,11 @@ class dataset_calculation:
         self.y_response_sum = np.sum(self.y_response_treated)
         self.num_patients = len(self.y_response_treated)
         
+<<<<<<< HEAD
         self.response_vector= np.zeros(1000000) # not sure how to size this. use this for now
+=======
+        self.response_matrix = np.zeros(100000,num_patients) # not sure how to size this. use this for now
+>>>>>>> origin/master
         
     # get the treatment response for a specific subgroup
     def get_treatment_response(self, s1): 
@@ -126,6 +143,7 @@ class dataset_calculation:
         avg_diff = (sub_sum / num_in_sub) - (not_subgroup_sum / num_not_in_sub)
         return avg_diff
         
+<<<<<<< HEAD
     def subgroup_combination(self): 
         
         # i is the number of patients in subgroup (1 corresponds to 2 patients)
@@ -156,6 +174,11 @@ class dataset_calculation:
                 self.response_vector[self.index] = self.get_treatment_response(subgroup)
                 self.index = self.index + 1 
                 self.recursive_gen(subgroup)
+=======
+    def subgroup_combination(): 
+        
+        
+>>>>>>> origin/master
 
         
         
@@ -207,6 +230,7 @@ def main() :
       
       
     #print ("Patient length check " + str(len((patient_groups.keys()))))
+<<<<<<< HEAD
 #    p1 = patient_groups[1][0] 
 #    p2 = patient_groups[1][1] 
 #    
@@ -230,6 +254,31 @@ def main() :
 #    print(str(p1.v1_2))
 #    print("end patient init")
 #    
+=======
+    p1 = patient_groups[1][0] 
+    p2 = patient_groups[1][1] 
+    
+    p3 = patient_groups[1][2]
+    p4 = patient_groups[1][3]
+    
+    s1 = Subgroup(p1,p2)
+    s2 = Subgroup(p3,p4)
+    
+    d1 = dataset_calculation(1)
+    trt = d1.get_treatment_response(s1)
+    print(str(trt))
+    
+#    print("patient init")
+#    print(str(p1.gen_char))
+#    print(str(p1.v0))
+#    print(str(p1.v1))
+#    print(str(p1.v2))
+#    print(str(p1.v0_1))
+#    print(str(p1.v0_2))
+#    print(str(p1.v1_2))
+#    print("end patient init")
+#    
+>>>>>>> origin/master
 #    print("patient init")
 #    print(str(p2.gen_char))
 #    print(str(p2.v0))
@@ -267,8 +316,12 @@ def main() :
 #    print(str(s2.v_min))
 #    
        
+<<<<<<< HEAD
     data_1 = dataset_calculation(1)
     data_1.subgroup_combination()
+=======
+    
+>>>>>>> origin/master
     end_time = time.clock()
     print("Time Elapsed: " + str((end_time - start_time)))    
     
