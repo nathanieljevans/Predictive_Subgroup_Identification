@@ -57,6 +57,7 @@ class Subgroup :
 #    
     # initialize with two patients
     def __init__ (self, p1, p2) :   
+        self.last_id = p2.id
 
         self.subgroup_ids = [p1.id, p2.id]
         self.y_treatment = [p1.y_response,p2.y_response]
@@ -77,6 +78,7 @@ class Subgroup :
         
         
     def add_patient(self, p): 
+        self.last_id = p.id
         self.subgroup_id.append(p.id)
         self.y_treatment.append(p)   
                 
@@ -92,6 +94,7 @@ class Subgroup :
         self.v_min = np.minimum(self.v_min, p.patient_char) # all patients in this subgroup have trait x_i greater than min[i]
         
 class dataset_calculation: 
+    index = 0
     
     def __init__ (self, data_id):
         
@@ -111,7 +114,7 @@ class dataset_calculation:
         self.y_response_sum = np.sum(self.y_response_treated)
         self.num_patients = len(self.y_response_treated)
         
-        self.response_matrix = np.zeros(100000,num_patients) # not sure how to size this. use this for now
+        self.response_vector= np.zeros(1000000) # not sure how to size this. use this for now
         
     # get the treatment response for a specific subgroup
     def get_treatment_response(self, s1): 
@@ -122,12 +125,30 @@ class dataset_calculation:
         avg_diff = (sub_sum / num_in_sub) - (not_subgroup_sum / num_not_in_sub)
         return avg_diff
         
-    def subgroup_combination(): 
+    def subgroup_combination(self): 
         
         # i is the number of patients in subgroup (1 corresponds to 2 patients)
-        for i in arrange(num_patients-1):
-            for i in arrange():
-                a change
+        # generates all the patients
+        
+        for i in range(self.num_patients-1):
+            for n in range(self.num_patients - 1):
+                if (n > i): 
+                    subgroup = Subgroup(self.patient_set[i], self.patient_set[n])
+                    self.response_vector[index] = get_treatment_response(subgroup)
+                    index = index + 1
+                    recursive_gen(subgroup)
+                
+    def recursive_gen(self, subgroup): 
+        # exit test 
+        if (len(subgroup.subgroup.ids) == self.num_patients): 
+            return 0 
+        
+        else: 
+            for i in range(subgroup.last_id + 1, self.num_patients-1,1): 
+                subgroup.add_patient(self.patient_set[i])
+                response_vector[index] = get_treatment_response(subgroup)
+                index = index + 1 
+                recursive_gen(subgroup)
 
         
         
